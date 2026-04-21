@@ -1,0 +1,1713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AIKORSE — The World's First AI-Powered Stress Ball</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #070707;
+    --bg2: #0e0e0e;
+    --bg3: #141414;
+    --fg: #f0ede8;
+    --fg2: #a09d98;
+    --fg3: #5a5753;
+    --lime: oklch(0.88 0.22 128);
+    --lime-dim: oklch(0.6 0.16 128);
+    --lime-glow: oklch(0.88 0.22 128 / 0.12);
+    --red: oklch(0.65 0.2 25);
+    --border: rgba(240,237,232,0.07);
+    --border2: rgba(240,237,232,0.12);
+    --r: 4px;
+    --font: 'Space Grotesk', sans-serif;
+    --mono: 'DM Mono', monospace;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font);
+    font-size: 17px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* Noise overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.6;
+  }
+
+  /* Nav */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 40px;
+    height: 64px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(7,7,7,0.85);
+    backdrop-filter: blur(16px);
+  }
+  .nav-logo {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--lime);
+  }
+  .nav-links {
+    display: flex;
+    gap: 32px;
+    list-style: none;
+  }
+  .nav-links a {
+    color: var(--fg2);
+    text-decoration: none;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--fg); }
+  .nav-cta {
+    background: var(--lime);
+    color: #070707;
+    border: none;
+    padding: 8px 20px;
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: var(--r);
+    transition: opacity 0.2s;
+  }
+  .nav-cta:hover { opacity: 0.85; }
+
+  /* Sections */
+  section { position: relative; }
+
+  /* ── HERO ── */
+  #hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 120px 40px 80px;
+    overflow: hidden;
+  }
+
+  .hero-bg-glow {
+    position: absolute;
+    width: 700px; height: 700px;
+    background: radial-gradient(circle, oklch(0.88 0.22 128 / 0.06) 0%, transparent 70%);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    animation: pulse-glow 4s ease-in-out infinite;
+  }
+  @keyframes pulse-glow {
+    0%, 100% { opacity: 0.6; transform: translate(-50%, -50%) scale(1); }
+    50% { opacity: 1; transform: translate(-50%, -50%) scale(1.08); }
+  }
+
+  .hero-eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--lime);
+    border: 1px solid var(--lime-dim);
+    padding: 6px 16px;
+    border-radius: 100px;
+    margin-bottom: 36px;
+    display: inline-block;
+    animation: fade-up 0.8s ease both;
+  }
+
+  .hero-title {
+    font-size: clamp(60px, 11vw, 148px);
+    font-weight: 700;
+    line-height: 0.92;
+    letter-spacing: -0.04em;
+    margin-bottom: 12px;
+    animation: fade-up 0.8s 0.1s ease both;
+  }
+  .hero-title span { color: var(--lime); }
+
+  .hero-sub {
+    font-size: clamp(16px, 2vw, 22px);
+    color: var(--fg2);
+    max-width: 520px;
+    margin: 28px auto 0;
+    font-weight: 400;
+    line-height: 1.6;
+    animation: fade-up 0.8s 0.2s ease both;
+  }
+
+  .hero-meta {
+    margin-top: 48px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--fg3);
+    letter-spacing: 0.15em;
+    animation: fade-up 0.8s 0.35s ease both;
+  }
+
+  .hero-scroll {
+    position: absolute;
+    bottom: 36px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--fg3);
+    letter-spacing: 0.15em;
+    animation: fade-up 0.8s 0.5s ease both;
+  }
+  .scroll-line {
+    width: 1px;
+    height: 48px;
+    background: linear-gradient(to bottom, var(--fg3), transparent);
+    animation: scroll-line 2s ease-in-out infinite;
+  }
+  @keyframes scroll-line {
+    0% { transform: scaleY(0); transform-origin: top; opacity: 0; }
+    50% { transform: scaleY(1); transform-origin: top; opacity: 1; }
+    100% { transform: scaleY(1); transform-origin: bottom; opacity: 0; }
+  }
+
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── STATEMENT ── */
+  #statement {
+    padding: 140px 40px;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+  .statement-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--lime);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+  .statement-text {
+    font-size: clamp(30px, 4.5vw, 58px);
+    font-weight: 600;
+    line-height: 1.18;
+    letter-spacing: -0.025em;
+    text-wrap: balance;
+  }
+  .statement-text em { color: var(--fg2); font-style: normal; }
+
+  /* ── MODEL ── */
+  #model {
+    padding: 100px 40px;
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .model-inner {
+    max-width: 1160px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+  .model-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--lime);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .model-title {
+    font-size: clamp(42px, 6vw, 80px);
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.04em;
+    margin-bottom: 20px;
+  }
+  .model-body { color: var(--fg2); font-size: 16px; line-height: 1.7; max-width: 420px; }
+  .model-card {
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-radius: 12px;
+    padding: 40px;
+    font-family: var(--mono);
+  }
+  .model-card-title {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--fg3);
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+  .model-stat {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .model-stat:last-child { border-bottom: none; }
+  .model-stat-key { font-size: 12px; color: var(--fg3); }
+  .model-stat-val { font-size: 14px; color: var(--lime); font-weight: 500; }
+
+  /* ── FEATURES ── */
+  #features {
+    padding: 120px 40px;
+    max-width: 1160px;
+    margin: 0 auto;
+  }
+  .section-header {
+    text-align: center;
+    margin-bottom: 80px;
+  }
+  .section-header h2 {
+    font-size: clamp(36px, 5vw, 64px);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    margin-bottom: 16px;
+  }
+  .section-header p { color: var(--fg2); font-size: 16px; max-width: 480px; margin: 0 auto; }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .feature-card {
+    padding: 44px 36px;
+    background: var(--bg2);
+    transition: background 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .feature-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--lime-glow);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .feature-card:hover { background: var(--bg3); }
+  .feature-card:hover::after { opacity: 1; }
+  .feature-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--fg3);
+    letter-spacing: 0.15em;
+    margin-bottom: 24px;
+  }
+  .feature-icon {
+    width: 48px; height: 48px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .feature-icon svg { width: 32px; height: 32px; }
+  .feature-card h3 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    letter-spacing: -0.02em;
+  }
+  .feature-card p { color: var(--fg2); font-size: 14px; line-height: 1.6; }
+  .feature-tag {
+    display: inline-block;
+    margin-top: 16px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--lime-dim);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  /* ── STATS ── */
+  #stats {
+    padding: 120px 40px;
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .stats-inner { max-width: 1160px; margin: 0 auto; }
+  .stats-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--lime);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 72px;
+  }
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .stat-item {
+    padding: 52px 36px;
+    background: var(--bg2);
+    text-align: center;
+  }
+  .stat-num {
+    font-size: clamp(44px, 5vw, 72px);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    color: var(--lime);
+    display: block;
+    line-height: 1;
+    margin-bottom: 12px;
+  }
+  .stat-label { font-size: 13px; color: var(--fg3); font-family: var(--mono); letter-spacing: 0.1em; }
+
+  /* ── INTERACTIVE ── */
+  #interactive {
+    padding: 120px 40px;
+    max-width: 1160px;
+    margin: 0 auto;
+  }
+  .interactive-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+  }
+  .interactive-title {
+    font-size: clamp(32px, 4vw, 52px);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    margin-bottom: 16px;
+  }
+  .interactive-body { color: var(--fg2); margin-bottom: 32px; line-height: 1.7; }
+  .slider-group { margin-bottom: 24px; }
+  .slider-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+  .slider-key { font-size: 13px; color: var(--fg2); }
+  .slider-val { font-family: var(--mono); font-size: 13px; color: var(--lime); }
+  input[type=range] {
+    -webkit-appearance: none;
+    width: 100%; height: 2px;
+    background: var(--border2);
+    outline: none;
+    border-radius: 2px;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: var(--lime);
+    cursor: pointer;
+    box-shadow: 0 0 12px var(--lime-glow);
+  }
+  .score-display {
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-radius: 12px;
+    padding: 40px;
+    text-align: center;
+  }
+  .score-big {
+    font-size: 80px;
+    font-weight: 700;
+    color: var(--lime);
+    letter-spacing: -0.05em;
+    line-height: 1;
+    font-family: var(--mono);
+  }
+  .score-label { color: var(--fg3); font-family: var(--mono); font-size: 12px; margin-top: 8px; letter-spacing: 0.15em; }
+  .score-bar-wrap { margin-top: 28px; }
+  .score-bar-track { height: 4px; background: var(--border); border-radius: 4px; overflow: hidden; }
+  .score-bar-fill { height: 100%; background: var(--lime); border-radius: 4px; transition: width 0.4s; }
+
+  /* ── TICKER ── */
+  .ticker-section {
+    padding: 28px 0;
+    background: var(--lime);
+    overflow: hidden;
+    border-top: none;
+  }
+  .ticker-track {
+    display: flex;
+    gap: 0;
+    animation: ticker 25s linear infinite;
+    white-space: nowrap;
+  }
+  .ticker-item {
+    color: #070707;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0 40px;
+    flex-shrink: 0;
+  }
+  .ticker-sep { color: rgba(7,7,7,0.4); }
+  @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+  /* ── TESTIMONIALS ── */
+  #testimonials {
+    padding: 120px 40px;
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+  }
+  .testimonials-header { text-align: center; margin-bottom: 72px; }
+  .testimonials-header h2 {
+    font-size: clamp(34px, 5vw, 60px);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    margin-bottom: 8px;
+  }
+  .rating-line {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--fg3);
+    letter-spacing: 0.12em;
+  }
+  .rating-stars { color: var(--lime); margin-right: 8px; }
+  .testimonials-grid {
+    max-width: 1160px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  .testimonial-card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 32px;
+    transition: border-color 0.3s, transform 0.3s;
+  }
+  .testimonial-card:hover {
+    border-color: var(--border2);
+    transform: translateY(-4px);
+  }
+  .t-stars { color: var(--lime); font-size: 13px; margin-bottom: 16px; }
+  .t-quote { font-size: 15px; line-height: 1.6; color: var(--fg); margin-bottom: 20px; }
+  .t-author { display: flex; gap: 12px; align-items: center; }
+  .t-avatar {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: var(--border2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .t-name { font-size: 13px; font-weight: 600; }
+  .t-role { font-size: 12px; color: var(--fg3); font-family: var(--mono); }
+  .t-rating { margin-top: 12px; font-family: var(--mono); font-size: 11px; color: var(--lime); }
+
+  /* ── PRODUCT TIERS ── */
+  #pricing {
+    padding: 120px 40px;
+    max-width: 1160px;
+    margin: 0 auto;
+  }
+  .pricing-header { text-align: center; margin-bottom: 72px; }
+  .pricing-header h2 {
+    font-size: clamp(36px, 5vw, 60px);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    margin-bottom: 16px;
+  }
+  .tier-switcher {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    margin-bottom: 60px;
+    border: 1px solid var(--border2);
+    border-radius: 100px;
+    padding: 4px;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .tier-btn {
+    background: transparent;
+    border: none;
+    color: var(--fg3);
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 500;
+    padding: 8px 24px;
+    border-radius: 100px;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.05em;
+  }
+  .tier-btn.active { background: var(--lime); color: #070707; }
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  .pricing-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 40px 32px;
+    transition: border-color 0.3s;
+    position: relative;
+  }
+  .pricing-card.featured {
+    border-color: var(--lime);
+    background: var(--bg3);
+  }
+  .featured-badge {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--lime);
+    color: #070707;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 4px 14px;
+    border-radius: 100px;
+    white-space: nowrap;
+  }
+  .pricing-name { font-size: 13px; font-weight: 600; color: var(--fg2); letter-spacing: 0.1em; margin-bottom: 8px; text-transform: uppercase; font-family: var(--mono); }
+  .pricing-price { font-size: 48px; font-weight: 700; letter-spacing: -0.04em; margin-bottom: 4px; }
+  .pricing-desc { color: var(--fg3); font-size: 13px; margin-bottom: 32px; }
+  .pricing-divider { height: 1px; background: var(--border); margin-bottom: 28px; }
+  .pricing-feature { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 14px; font-size: 14px; }
+  .pricing-feature-check { color: var(--lime); flex-shrink: 0; margin-top: 2px; }
+  .pricing-cta {
+    display: block;
+    width: 100%;
+    text-align: center;
+    padding: 14px;
+    border-radius: 8px;
+    font-family: var(--font);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 28px;
+    border: 1px solid var(--border2);
+    background: transparent;
+    color: var(--fg);
+    transition: all 0.2s;
+    letter-spacing: 0.05em;
+  }
+  .pricing-card.featured .pricing-cta {
+    background: var(--lime);
+    border-color: var(--lime);
+    color: #070707;
+  }
+  .pricing-cta:hover { opacity: 0.8; }
+
+  /* ── TECH ── */
+  #tech {
+    padding: 120px 40px;
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+  }
+  .tech-inner {
+    max-width: 1160px;
+    margin: 0 auto;
+  }
+  .tech-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: start;
+  }
+  .tech-title {
+    font-size: clamp(34px, 4.5vw, 54px);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    margin-bottom: 24px;
+  }
+  .tech-body { color: var(--fg2); line-height: 1.7; margin-bottom: 32px; }
+  .tech-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+  .tech-tag {
+    border: 1px solid var(--border2);
+    border-radius: 100px;
+    padding: 6px 14px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--fg2);
+    letter-spacing: 0.1em;
+  }
+  .tech-card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 40px;
+    font-family: var(--mono);
+  }
+  .tech-card-head {
+    font-size: 11px;
+    color: var(--fg3);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 32px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .tech-bar { margin-bottom: 20px; }
+  .tech-bar-header { display: flex; justify-content: space-between; margin-bottom: 6px; }
+  .tech-bar-key { font-size: 12px; color: var(--fg2); }
+  .tech-bar-val { font-size: 12px; color: var(--lime); }
+  .tech-bar-track { height: 3px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .tech-bar-fill { height: 100%; background: linear-gradient(to right, var(--lime), oklch(0.88 0.22 180)); border-radius: 3px; }
+
+  /* ── SOCIAL GRID ── */
+  #social-grid {
+    padding: 120px 40px;
+    max-width: 1160px;
+    margin: 0 auto;
+  }
+  .sg-title {
+    font-size: clamp(30px, 4vw, 50px);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    margin-bottom: 12px;
+  }
+  .sg-sub { color: var(--fg2); margin-bottom: 52px; }
+  .sg-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2px;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .sg-card {
+    background: var(--bg2);
+    padding: 32px 24px;
+    border: 1px solid var(--border);
+    aspect-ratio: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: background 0.3s;
+  }
+  .sg-card:hover { background: var(--bg3); }
+  .sg-card-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--lime);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+  .sg-card-content { font-size: 18px; font-weight: 600; line-height: 1.3; letter-spacing: -0.01em; }
+  .sg-card-sub { font-size: 12px; color: var(--fg3); }
+  .sg-card.accent { background: var(--lime); }
+  .sg-card.accent .sg-card-tag { color: rgba(7,7,7,0.6); }
+  .sg-card.accent .sg-card-content { color: #070707; }
+  .sg-card.accent .sg-card-sub { color: rgba(7,7,7,0.5); }
+
+  /* ── PAPER ── */
+  #paper {
+    padding: 120px 40px;
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+  }
+  .paper-inner {
+    max-width: 760px;
+    margin: 0 auto;
+  }
+  .paper-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--lime);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .paper-title {
+    font-size: clamp(28px, 4vw, 48px);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    margin-bottom: 32px;
+  }
+  .paper-abstract {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 40px;
+    margin-bottom: 32px;
+  }
+  .paper-abstract-head {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--fg3);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .paper-abstract p { color: var(--fg2); font-size: 15px; line-height: 1.8; }
+  .paper-links { display: flex; gap: 16px; flex-wrap: wrap; }
+  .paper-link {
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--fg2);
+    text-decoration: none;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: all 0.2s;
+  }
+  .paper-link:hover { border-color: var(--lime); color: var(--lime); }
+  .paper-review {
+    margin-top: 28px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px 32px;
+  }
+  .paper-review-label { font-family: var(--mono); font-size: 10px; color: var(--fg3); letter-spacing: 0.15em; margin-bottom: 12px; }
+  .paper-review blockquote { font-size: 16px; color: var(--fg2); line-height: 1.6; font-style: italic; }
+  .paper-review cite { display: block; margin-top: 10px; font-size: 12px; color: var(--fg3); font-family: var(--mono); font-style: normal; }
+
+  /* ── FAQ ── */
+  #faq {
+    padding: 120px 40px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .faq-head { text-align: center; margin-bottom: 64px; }
+  .faq-head h2 { font-size: clamp(34px, 5vw, 56px); font-weight: 700; letter-spacing: -0.03em; }
+  .faq-item {
+    border-bottom: 1px solid var(--border);
+    padding: 28px 0;
+    cursor: pointer;
+  }
+  .faq-q {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 17px;
+    font-weight: 500;
+    gap: 20px;
+  }
+  .faq-icon { flex-shrink: 0; color: var(--lime); font-size: 20px; transition: transform 0.3s; }
+  .faq-item.open .faq-icon { transform: rotate(45deg); }
+  .faq-a {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease, padding 0.3s;
+    color: var(--fg2);
+    font-size: 15px;
+    line-height: 1.7;
+  }
+  .faq-item.open .faq-a { max-height: 200px; padding-top: 16px; }
+
+  /* ── CTA ── */
+  #cta {
+    padding: 160px 40px;
+    text-align: center;
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+  .cta-glow {
+    position: absolute;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, oklch(0.88 0.22 128 / 0.08), transparent 70%);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+  .cta-eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--lime);
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+  .cta-title {
+    font-size: clamp(36px, 6vw, 84px);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    max-width: 800px;
+    margin: 0 auto 24px;
+    line-height: 1.05;
+  }
+  .cta-sub { color: var(--fg2); max-width: 480px; margin: 0 auto 48px; font-size: 17px; }
+  .cta-buttons { display: flex; gap: 16px; justify-content: center; }
+  .btn-primary {
+    background: var(--lime);
+    color: #070707;
+    border: none;
+    padding: 16px 36px;
+    font-family: var(--font);
+    font-size: 15px;
+    font-weight: 700;
+    border-radius: 8px;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    transition: opacity 0.2s;
+  }
+  .btn-primary:hover { opacity: 0.85; }
+  .btn-ghost {
+    background: transparent;
+    color: var(--fg);
+    border: 1px solid var(--border2);
+    padding: 16px 36px;
+    font-family: var(--font);
+    font-size: 15px;
+    font-weight: 500;
+    border-radius: 8px;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    transition: border-color 0.2s;
+  }
+  .btn-ghost:hover { border-color: var(--fg2); }
+
+  /* ── FOOTER ── */
+  footer {
+    padding: 60px 40px;
+    border-top: 1px solid var(--border);
+    max-width: 1160px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 24px;
+  }
+  .footer-logo { font-size: 14px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--lime); }
+  .footer-links { display: flex; gap: 28px; list-style: none; }
+  .footer-links a { color: var(--fg3); text-decoration: none; font-size: 13px; transition: color 0.2s; }
+  .footer-links a:hover { color: var(--fg); }
+  .footer-copy { font-size: 12px; color: var(--fg3); font-family: var(--mono); }
+  .footer-disclaimer {
+    width: 100%;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--fg3);
+    border-top: 1px solid var(--border);
+    padding-top: 24px;
+    margin-top: 12px;
+    line-height: 1.6;
+    text-align: center;
+  }
+
+  /* ── Scroll reveal ── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(32px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible { opacity: 1; transform: none; }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+  .reveal-delay-4 { transition-delay: 0.4s; }
+  .reveal-delay-5 { transition-delay: 0.5s; }
+  .reveal-delay-6 { transition-delay: 0.6s; }
+
+  /* ── TWEAKS panel ── */
+  #tweaks-panel {
+    display: none;
+    position: fixed;
+    bottom: 24px; right: 24px;
+    width: 260px;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-radius: 12px;
+    padding: 20px;
+    z-index: 200;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+  }
+  .tweaks-title { font-size: 12px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--lime); margin-bottom: 20px; font-family: var(--mono); }
+  .tweak-row { margin-bottom: 16px; }
+  .tweak-label { font-size: 12px; color: var(--fg2); margin-bottom: 6px; display: flex; justify-content: space-between; }
+  .tweak-label span { color: var(--lime); font-family: var(--mono); }
+  .tweak-select {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border2);
+    color: var(--fg);
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    outline: none;
+    cursor: pointer;
+  }
+  .tweak-toggle-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; font-size: 13px; color: var(--fg2); }
+  .tweak-toggle {
+    width: 36px; height: 20px;
+    background: var(--border2);
+    border-radius: 100px;
+    position: relative;
+    cursor: pointer;
+    transition: background 0.2s;
+    border: none;
+  }
+  .tweak-toggle.on { background: var(--lime); }
+  .tweak-toggle::after {
+    content: '';
+    position: absolute;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: white;
+    top: 3px; left: 3px;
+    transition: transform 0.2s;
+  }
+  .tweak-toggle.on::after { transform: translateX(16px); background: #070707; }
+
+  @media (max-width: 768px) {
+    nav { padding: 0 20px; }
+    .nav-links { display: none; }
+    #hero { padding: 100px 20px 60px; }
+    .model-inner, .interactive-grid, .tech-grid { grid-template-columns: 1fr; gap: 40px; }
+    .features-grid { grid-template-columns: 1fr; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .testimonials-grid { grid-template-columns: 1fr; }
+    .pricing-grid { grid-template-columns: 1fr; }
+    .sg-grid { grid-template-columns: repeat(2, 1fr); }
+    footer { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">AIKORSE</div>
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#testimonials">Reviews</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#paper">Research</a></li>
+  </ul>
+  <button class="nav-cta">Order Now</button>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg-glow"></div>
+  <div class="hero-eyebrow">AIKORSE-1 Model — Now Available</div>
+  <h1 class="hero-title">The World's<br><span>Best</span><br>Learning Platform.</h1>
+  <p class="hero-sub">Designed to squeeze, comfort, and absolutely overthink it. AIKORSE is the result of 4 years of completely unnecessary AI research.</p>
+  <p class="hero-meta">AIKORSE-1 · OPEN WEIGHT · 73B PARAMETERS* &nbsp;·&nbsp; *Adobe InDesign</p>
+  <div class="hero-scroll">
+    SCROLL
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- STATEMENT -->
+<section id="statement">
+  <div class="statement-label">The breakthrough</div>
+  <p class="statement-text">
+    AIKORSE isn't just a stress ball. It's a <em>paradigm-shifting, deeply unnecessary</em> convergence of tactile computing, ambient intelligence, and premium foam technology.
+  </p>
+</section>
+
+<!-- TICKER -->
+<div class="ticker-section">
+  <div class="ticker-track" id="ticker">
+    <span class="ticker-item">AIKORSE-1 <span class="ticker-sep">—</span></span>
+    <span class="ticker-item">Now Shipping <span class="ticker-sep">—</span></span>
+    <span class="ticker-item">73B Parameters <span class="ticker-sep">—</span></span>
+    <span class="ticker-item">Zero Latency* <span class="ticker-sep">—</span></span>
+    <span class="ticker-item">Open Weight <span class="ticker-sep">—</span></span>
+    <span class="ticker-item">Squeeze to Activate <span class="ticker-sep">—</span></span>
+    <span class="ticker-item">AIKORSE-1 <span class="ticker-sep">—</span></span>
+    <span class="ticker-item">Now Shipping <span class="ticker-sep">—</span></span>
+    <span class="ticker-item">73B Parameters <span class="ticker-sep">—</span></span>
+    <span class="ticker-item">Zero Latency* <span class="ticker-sep">—</span></span>
+    <span class="ticker-item">Open Weight <span class="ticker-sep">—</span></span>
+    <span class="ticker-item">Squeeze to Activate <span class="ticker-sep">—</span></span>
+    <span class="ticker-item">AIKORSE-1 <span class="ticker-sep">—</span></span>
+    <span class="ticker-item">Now Shipping <span class="ticker-sep">—</span></span>
+    <span class="ticker-item">73B Parameters <span class="ticker-sep">—</span></span>
+    <span class="ticker-item">Zero Latency* <span class="ticker-sep">—</span></span>
+  </div>
+</div>
+
+<!-- MODEL -->
+<section id="model">
+  <div class="model-inner">
+    <div class="reveal">
+      <div class="model-label">AIKORSE-1 Architecture</div>
+      <h2 class="model-title">Powered by AI*</h2>
+      <p class="model-body">A groundbreaking foam substrate model trained on 2 million hours of human frustration data, stress patterns, and a single motivational poster that said "You Got This."</p>
+      <br>
+      <p class="model-body" style="font-size:13px;color:var(--fg3)">* Adobe Illustrator. All performance claims are entirely made up.</p>
+    </div>
+    <div class="reveal reveal-delay-2">
+      <div class="model-card">
+        <div class="model-card-title">AIKORSE-1 · Model Card v0.1</div>
+        <div class="model-stat"><span class="model-stat-key">Parameters</span><span class="model-stat-val">73B (estimated)</span></div>
+        <div class="model-stat"><span class="model-stat-key">Context window</span><span class="model-stat-val">One squeeze</span></div>
+        <div class="model-stat"><span class="model-stat-key">Modality</span><span class="model-stat-val">Tactile / Emotional</span></div>
+        <div class="model-stat"><span class="model-stat-key">Inference speed</span><span class="model-stat-val">0ms latency</span></div>
+        <div class="model-stat"><span class="model-stat-key">Power draw</span><span class="model-stat-val">0W (no power)</span></div>
+        <div class="model-stat"><span class="model-stat-key">GPU requirement</span><span class="model-stat-val">None. It's a ball.</span></div>
+        <div class="model-stat"><span class="model-stat-key">License</span><span class="model-stat-val">AIKORSE Open</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="section-header reveal">
+    <h2>Features that justify<br>the price.</h2>
+    <p>Each one more unnecessary than the last.</p>
+  </div>
+  <div class="features-grid">
+    <div class="feature-card reveal">
+      <div class="feature-num">01</div>
+      <div class="feature-icon">
+        <svg viewBox="0 0 32 32" fill="none" stroke="oklch(0.88 0.22 128)" stroke-width="1.5">
+          <circle cx="16" cy="16" r="12"/>
+          <path d="M10 16 L16 10 L22 16 L16 22 Z"/>
+        </svg>
+      </div>
+      <h3>Perfect Spherical Form</h3>
+      <p>Our engineers spent 18 months recalibrating the circumference. It is round. Very round.</p>
+      <span class="feature-tag">GEOMETRY ENGINE v3</span>
+    </div>
+    <div class="feature-card reveal reveal-delay-1">
+      <div class="feature-num">02</div>
+      <div class="feature-icon">
+        <svg viewBox="0 0 32 32" fill="none" stroke="oklch(0.88 0.22 128)" stroke-width="1.5">
+          <path d="M4 28 L4 12 L16 4 L28 12 L28 28 Z"/>
+          <path d="M12 28 L12 20 L20 20 L20 28"/>
+        </svg>
+      </div>
+      <h3>On-Device Intelligence</h3>
+      <p>No cloud. No tokens. No subscriptions. Your stress stays local, private, and entirely unaddressed.</p>
+      <span class="feature-tag">EDGE COMPUTING</span>
+    </div>
+    <div class="feature-card reveal reveal-delay-2">
+      <div class="feature-num">03</div>
+      <div class="feature-icon">
+        <svg viewBox="0 0 32 32" fill="none" stroke="oklch(0.88 0.22 128)" stroke-width="1.5">
+          <path d="M16 4 C8 4 4 10 4 16 C4 22 8 28 16 28 C24 28 28 22 28 16"/>
+          <path d="M20 4 L28 4 L28 12"/>
+        </svg>
+      </div>
+      <h3>Infinite Durability</h3>
+      <p>Drop-tested on every hard surface we could find. The floor lost. Results: pending peer review.</p>
+      <span class="feature-tag">IMPACT RESISTANCE</span>
+    </div>
+    <div class="feature-card reveal reveal-delay-1">
+      <div class="feature-num">04</div>
+      <div class="feature-icon">
+        <svg viewBox="0 0 32 32" fill="none" stroke="oklch(0.88 0.22 128)" stroke-width="1.5">
+          <rect x="6" y="6" width="20" height="20" rx="2"/>
+          <path d="M11 16 L14 19 L21 12"/>
+        </svg>
+      </div>
+      <h3>Multi-Grip Architecture</h3>
+      <p>Squeeze it. Palm it. Throw it gently against the wall. AIKORSE adapts to all 17 supported grip modalities.</p>
+      <span class="feature-tag">HAPTIC INTERFACE</span>
+    </div>
+    <div class="feature-card reveal reveal-delay-2">
+      <div class="feature-num">05</div>
+      <div class="feature-icon">
+        <svg viewBox="0 0 32 32" fill="none" stroke="oklch(0.88 0.22 128)" stroke-width="1.5">
+          <path d="M16 4 L16 28 M4 16 L28 16"/>
+          <circle cx="16" cy="16" r="5"/>
+        </svg>
+      </div>
+      <h3>Quantum Resilience</h3>
+      <p>Returns to original shape after every squeeze using what our team is calling "foam memory" or just... foam.</p>
+      <span class="feature-tag">SHAPE RECOVERY</span>
+    </div>
+    <div class="feature-card reveal reveal-delay-3">
+      <div class="feature-num">06</div>
+      <div class="feature-icon">
+        <svg viewBox="0 0 32 32" fill="none" stroke="oklch(0.88 0.22 128)" stroke-width="1.5">
+          <path d="M8 24 C8 16 12 12 16 12 C20 12 24 16 24 24"/>
+          <circle cx="16" cy="8" r="3"/>
+        </svg>
+      </div>
+      <h3>Always-On Comfort</h3>
+      <p>24/7 uptime. Zero power draw. AIKORSE is always ready, unlike your company's SaaS platform.</p>
+      <span class="feature-tag">99.99% UPTIME</span>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section id="stats">
+  <div class="stats-inner">
+    <div class="stats-label reveal">By the numbers</div>
+    <div class="stats-grid">
+      <div class="stat-item reveal">
+        <span class="stat-num" data-count="364">0</span>
+        <span class="stat-label">5-STAR REVIEWS</span>
+      </div>
+      <div class="stat-item reveal reveal-delay-1">
+        <span class="stat-num" data-count="17">0</span>
+        <span class="stat-label">GRIP MODES</span>
+      </div>
+      <div class="stat-item reveal reveal-delay-2">
+        <span class="stat-num" data-suffix="M" data-count="4">0</span>
+        <span class="stat-label">SQUEEZES TESTED</span>
+      </div>
+      <div class="stat-item reveal reveal-delay-3">
+        <span class="stat-num" data-suffix="%" data-count="100">0</span>
+        <span class="stat-label">UNNECESSARY</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- INTERACTIVE -->
+<section id="interactive">
+  <div class="interactive-grid">
+    <div class="reveal">
+      <h2 class="interactive-title">Configure your<br>stress level.</h2>
+      <p class="interactive-body">Dial in exactly how tightly you'd like to suppress your feelings. AIKORSE's Frustration Configuration Interface (FCI) gives you unprecedented control over… nothing, really. It's foam.</p>
+      <div class="slider-group">
+        <div class="slider-header">
+          <span class="slider-key">Anxiety level</span>
+          <span class="slider-val" id="val-anxiety">7</span>
+        </div>
+        <input type="range" min="0" max="10" value="7" id="sl-anxiety">
+      </div>
+      <div class="slider-group">
+        <div class="slider-header">
+          <span class="slider-key">Workplace frustration</span>
+          <span class="slider-val" id="val-frustration">5</span>
+        </div>
+        <input type="range" min="0" max="10" value="5" id="sl-frustration">
+      </div>
+      <div class="slider-group">
+        <div class="slider-header">
+          <span class="slider-key">Existential dread</span>
+          <span class="slider-val" id="val-dread">3</span>
+        </div>
+        <input type="range" min="0" max="10" value="3" id="sl-dread">
+      </div>
+    </div>
+    <div class="reveal reveal-delay-2">
+      <div class="score-display">
+        <div class="score-big" id="score-val">50</div>
+        <div class="score-label">AIKORSE STRESS INDEX™</div>
+        <div class="score-bar-wrap">
+          <div class="score-bar-track"><div class="score-bar-fill" id="score-bar" style="width:50%"></div></div>
+        </div>
+        <div style="margin-top:20px;font-family:var(--mono);font-size:12px;color:var(--fg3);line-height:1.6" id="score-msg">
+          Moderate. AIKORSE recommends 3–5 squeezes daily. Also maybe a walk.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="testimonials">
+  <div class="testimonials-header reveal">
+    <h2>People love it.<br>Allegedly.</h2>
+    <div class="rating-line"><span class="rating-stars">★★★★★</span> 4.9/5 across 364 custom reviews</div>
+  </div>
+  <div class="testimonials-grid">
+    <div class="testimonial-card reveal">
+      <div class="t-stars">★★★★★</div>
+      <p class="t-quote">"I deployed AIKORSE in our company's anxiety pipeline. 40% reduction in Slack messages. The board is thrilled."</p>
+      <div class="t-author">
+        <div class="t-avatar">🧑‍💼</div>
+        <div>
+          <div class="t-name">Marcus T.</div>
+          <div class="t-role">VP of Vibes, Fortune 500</div>
+        </div>
+      </div>
+      <div class="t-rating">[ 5 / 5 ]</div>
+    </div>
+    <div class="testimonial-card reveal reveal-delay-1">
+      <div class="t-stars">★★★★★</div>
+      <p class="t-quote">"Finally. An AI product that doesn't hallucinate. It also doesn't do anything, but the lack of hallucination is refreshing."</p>
+      <div class="t-author">
+        <div class="t-avatar">🧪</div>
+        <div>
+          <div class="t-name">Dr. Yuki N.</div>
+          <div class="t-role">AI Researcher, Somewhere Prestigious</div>
+        </div>
+      </div>
+      <div class="t-rating">[ 5 / 5 ]</div>
+    </div>
+    <div class="testimonial-card reveal reveal-delay-2">
+      <div class="t-stars">★★★★½</div>
+      <p class="t-quote">"I was skeptical of the 73B parameter claim. Then I remembered I also don't know what that means. Five stars."</p>
+      <div class="t-author">
+        <div class="t-avatar">🚀</div>
+        <div>
+          <div class="t-name">Priya V.</div>
+          <div class="t-role">Founder, Pre-revenue startup</div>
+        </div>
+      </div>
+      <div class="t-rating">[ 4.5 / 5 ]</div>
+    </div>
+    <div class="testimonial-card reveal reveal-delay-1">
+      <div class="t-stars">★★★★★</div>
+      <p class="t-quote">"My therapist asked what changed. I said AIKORSE. She nodded slowly and wrote something down. I choose to believe it was positive."</p>
+      <div class="t-author">
+        <div class="t-avatar">🎯</div>
+        <div>
+          <div class="t-name">Leon M.</div>
+          <div class="t-role">Recovering VC</div>
+        </div>
+      </div>
+      <div class="t-rating">[ 5 / 5 ]</div>
+    </div>
+    <div class="testimonial-card reveal reveal-delay-2">
+      <div class="t-stars">★★★★★</div>
+      <p class="t-quote">"I brought it to a board meeting. Nobody asked what it was. That was exactly the energy I needed."</p>
+      <div class="t-author">
+        <div class="t-avatar">🌍</div>
+        <div>
+          <div class="t-name">Sofia B.</div>
+          <div class="t-role">CEO, Somewhere Real</div>
+        </div>
+      </div>
+      <div class="t-rating">[ 5 / 5 ]</div>
+    </div>
+    <div class="testimonial-card reveal reveal-delay-3">
+      <div class="t-stars">★★★★★</div>
+      <p class="t-quote">"Runs perfectly on my RTX 3090. No VRAM issues whatsoever. Completely silent inference. Game-changing."</p>
+      <div class="t-author">
+        <div class="t-avatar">💻</div>
+        <div>
+          <div class="t-name">Greg H.</div>
+          <div class="t-role">Local LLaMA enthusiast</div>
+        </div>
+      </div>
+      <div class="t-rating">[ 5 / 5 ]</div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="pricing-header reveal">
+    <h2>Choose your model.</h2>
+    <p style="color:var(--fg2)">All tiers are essentially the same. This is important to understand.</p>
+  </div>
+  <div class="tier-switcher reveal">
+    <button class="tier-btn active" onclick="setTier(this)">Annual</button>
+    <button class="tier-btn" onclick="setTier(this)">Monthly</button>
+    <button class="tier-btn" onclick="setTier(this)">One-Time</button>
+  </div>
+  <div class="pricing-grid">
+    <div class="pricing-card reveal">
+      <div class="pricing-name">AIKORSE</div>
+      <div class="pricing-price">$9</div>
+      <div class="pricing-desc">The original. One foam ball.</div>
+      <div class="pricing-divider"></div>
+      <div class="pricing-feature"><span class="pricing-feature-check">✓</span><span>1x foam ball</span></div>
+      <div class="pricing-feature"><span class="pricing-feature-check">✓</span><span>Squeeze functionality</span></div>
+      <div class="pricing-feature"><span class="pricing-feature-check">✓</span><span>On-device inference (gravity)</span></div>
+      <div class="pricing-feature"><span class="pricing-feature-check">✓</span><span>Zero power draw</span></div>
+      <div class="pricing-feature"><span class="pricing-feature-check">✓</span><span>Open Weight license</span></div>
+      <button class="pricing-cta">Get AIKORSE</button>
+    </div>
+    <div class="pricing-card featured reveal reveal-delay-1">
+      <div class="featured-badge">Most Unnecessary</div>
+      <div class="pricing-name">AIKORSE Pro</div>
+      <div class="pricing-price">$19</div>
+      <div class="pricing-desc">A slightly larger foam ball.</div>
+      <div class="pricing-divider"></div>
+      <div class="pricing-feature"><span class="pricing-feature-check">✓</span><span>Everything in AIKORSE</span></div>
+      <div class="pricing-feature"><span class="pricing-feature-check">✓</span><span>15% more foam</span></div>
+      <div class="pricing-feature"><span class="pricing-feature-check">✓</span><span>Priority squeeze depth</span></div>
+      <div class="pricing-feature"><span class="pricing-feature-check">✓</span><span>Pro colorway (Anxiety Beige)</span></div>
+      <div class="pricing-feature"><span class="pricing-feature-check">✓</span><span>Extended warranty (vibes)</span></div>
+      <button class="pricing-cta">Get AIKORSE Pro</button>
+    </div>
+    <div class="pricing-card reveal reveal-delay-2">
+      <div class="pricing-name">AIKORSE Max</div>
+      <div class="pricing-price">$49</div>
+      <div class="pricing-desc">Three foam balls, in a box.</div>
+      <div class="pricing-divider"></div>
+      <div class="pricing-feature"><span class="pricing-feature-check">✓</span><span>Everything in Pro</span></div>
+      <div class="pricing-feature"><span class="pricing-feature-check">✓</span><span>3x foam ball cluster</span></div>
+      <div class="pricing-feature"><span class="pricing-feature-check">✓</span><span>Maximum unnecessary presence</span></div>
+      <div class="pricing-feature"><span class="pricing-feature-check">✓</span><span>Custom engraving ("AI")</span></div>
+      <div class="pricing-feature"><span class="pricing-feature-check">✓</span><span>Hand-signed by Adobe Illustrator</span></div>
+      <button class="pricing-cta">Get AIKORSE Max</button>
+    </div>
+  </div>
+</section>
+
+<!-- TECH -->
+<section id="tech">
+  <div class="tech-inner">
+    <div class="tech-grid">
+      <div class="reveal">
+        <h2 class="tech-title">Technical<br>Specifications.</h2>
+        <p class="tech-body">AIKORSE-1 achieves state-of-the-art performance across all major stress-relief benchmarks, including the proprietary SqueezeScore™ and the Workplace Frustration Index (WFI-400).</p>
+        <p class="tech-body">Our THERMAL DIFFUSION MODEL (TDM) ensures room-temperature regulation at ±0°C — because it's foam and foam does not generate heat.</p>
+        <div class="tech-tags">
+          <span class="tech-tag">SQUEEZE-BERT</span>
+          <span class="tech-tag">WFI-400</span>
+          <span class="tech-tag">TDM v2</span>
+          <span class="tech-tag">SqueezeScore™</span>
+          <span class="tech-tag">FoamDB</span>
+        </div>
+      </div>
+      <div class="reveal reveal-delay-2">
+        <div class="tech-card">
+          <div class="tech-card-head">PERFORMANCE BENCHMARKS · WFI-400</div>
+          <div class="tech-bar">
+            <div class="tech-bar-header"><span class="tech-bar-key">Stress Relief</span><span class="tech-bar-val">98.4</span></div>
+            <div class="tech-bar-track"><div class="tech-bar-fill" style="width:98.4%"></div></div>
+          </div>
+          <div class="tech-bar">
+            <div class="tech-bar-header"><span class="tech-bar-key">Squeeze Responsiveness</span><span class="tech-bar-val">100.0</span></div>
+            <div class="tech-bar-track"><div class="tech-bar-fill" style="width:100%"></div></div>
+          </div>
+          <div class="tech-bar">
+            <div class="tech-bar-header"><span class="tech-bar-key">Shape Recovery</span><span class="tech-bar-val">97.1</span></div>
+            <div class="tech-bar-track"><div class="tech-bar-fill" style="width:97.1%"></div></div>
+          </div>
+          <div class="tech-bar">
+            <div class="tech-bar-header"><span class="tech-bar-key">Hallucination Rate</span><span class="tech-bar-val">0.0%</span></div>
+            <div class="tech-bar-track"><div class="tech-bar-fill" style="width:2%"></div></div>
+          </div>
+          <div class="tech-bar">
+            <div class="tech-bar-header"><span class="tech-bar-key">Unnecessary Sophistication</span><span class="tech-bar-val">99.9</span></div>
+            <div class="tech-bar-track"><div class="tech-bar-fill" style="width:99.9%"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOCIAL GRID -->
+<section id="social-grid">
+  <div class="reveal">
+    <div class="sg-title">Runs on everything.</div>
+    <div class="sg-sub">Or nothing. It's foam. But these are the claims we're making.</div>
+  </div>
+  <div class="sg-grid">
+    <div class="sg-card reveal">
+      <div class="sg-card-tag">On-Device</div>
+      <div class="sg-card-content">Refuses the cloud. Refuses the bill.</div>
+      <div class="sg-card-sub">Local inference only</div>
+    </div>
+    <div class="sg-card accent reveal reveal-delay-1">
+      <div class="sg-card-tag">Always On</div>
+      <div class="sg-card-content">24/7 uptime. No power required.</div>
+      <div class="sg-card-sub">100% renewable vibes</div>
+    </div>
+    <div class="sg-card reveal reveal-delay-2">
+      <div class="sg-card-tag">GPU Support</div>
+      <div class="sg-card-content">Runs on RTX 3090. Somehow.</div>
+      <div class="sg-card-sub">No OOM on any consumer GPU</div>
+    </div>
+    <div class="sg-card reveal reveal-delay-3">
+      <div class="sg-card-tag">Legacy</div>
+      <div class="sg-card-content">Backward compat since 3000 BCE.</div>
+      <div class="sg-card-sub">Supporting ancient hands</div>
+    </div>
+    <div class="sg-card reveal">
+      <div class="sg-card-tag">Drop Tested</div>
+      <div class="sg-card-content">Hard surface. DATE: 02/29/2025.</div>
+      <div class="sg-card-sub">Damage: the floor. AIKORSE: fine.</div>
+    </div>
+    <div class="sg-card reveal reveal-delay-1">
+      <div class="sg-card-tag">Open Weight</div>
+      <div class="sg-card-content">Weights are just… mass.</div>
+      <div class="sg-card-sub">62g standard model</div>
+    </div>
+    <div class="sg-card reveal reveal-delay-2">
+      <div class="sg-card-tag">Portable</div>
+      <div class="sg-card-content">Fits in any pocket, bag, or existential void.</div>
+      <div class="sg-card-sub">Travel-safe, FDA not consulted</div>
+    </div>
+    <div class="sg-card accent reveal reveal-delay-3">
+      <div class="sg-card-tag">Vegan</div>
+      <div class="sg-card-content">100% plant-adjacent. Probably.</div>
+      <div class="sg-card-sub">No animals were squeezed</div>
+    </div>
+  </div>
+</section>
+
+<!-- PAPER -->
+<section id="paper">
+  <div class="paper-inner">
+    <div class="paper-label reveal">Our SOTA Open-Weight Model</div>
+    <h2 class="paper-title reveal">AIKORSE-1: A Tactile Foundation Model for Human Frustration Relief at Scale</h2>
+    <div class="paper-abstract reveal">
+      <div class="paper-abstract-head">Abstract</div>
+      <p>We present AIKORSE-1, an open-weight tactile model trained on 4 million squeeze interactions, 2.3 million expressions of workplace disappointment, and one motivational poster. AIKORSE-1 achieves state-of-the-art performance on SqueezeScore™ and WFI-400, outperforming all prior foam-based systems by a significant margin. We release checkpoints, documentation, and a 3D model (.OBJ) for reproducibility. Limitations: requires hands. Performance may vary during existential crises. We are aware.</p>
+    </div>
+    <div class="paper-links reveal">
+      <a href="#" class="paper-link">Paper (PDF)</a>
+      <a href="#" class="paper-link">Model (.OBJ)</a>
+      <a href="#" class="paper-link">Code (coming soon)</a>
+      <a href="#" class="paper-link">BibTeX</a>
+    </div>
+    <div class="paper-review reveal">
+      <div class="paper-review-label">Peer Review</div>
+      <blockquote>"AIKORSE-1 is the best stress relief model I have ever evaluated. The hallucination rate of 0.0% is unprecedented in the field. I am not making this up."</blockquote>
+      <cite>— Anonymous LocalLLaMA Reddit user, 4 karma</cite>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq">
+  <div class="faq-head reveal">
+    <h2>Frequently asked<br>questions.</h2>
+  </div>
+  <div class="faq-item reveal" onclick="toggleFaq(this)">
+    <div class="faq-q">Is AIKORSE actually powered by AI? <span class="faq-icon">+</span></div>
+    <div class="faq-a">Yes. Adobe Illustrator. We designed it using AI tools and then made it out of foam. The AI part refers to the design process, not the ball. Although we do note it has yet to hallucinate even once.</div>
+  </div>
+  <div class="faq-item reveal reveal-delay-1" onclick="toggleFaq(this)">
+    <div class="faq-q">What are the 73 billion parameters? <span class="faq-icon">+</span></div>
+    <div class="faq-a">This is a great question. The 73B refers to an internal Foam Density Estimation made during prototyping. We counted the molecules. It took a while. We may have miscounted.</div>
+  </div>
+  <div class="faq-item reveal reveal-delay-2" onclick="toggleFaq(this)">
+    <div class="faq-q">Can AIKORSE replace my therapist? <span class="faq-icon">+</span></div>
+    <div class="faq-a">No. Please do not replace your therapist with a foam ball. AIKORSE is a complementary tool, not a medical device. It is a ball. Though it does listen better than most people.</div>
+  </div>
+  <div class="faq-item reveal reveal-delay-3" onclick="toggleFaq(this)">
+    <div class="faq-q">What's the context window? <span class="faq-icon">+</span></div>
+    <div class="faq-a">One squeeze. AIKORSE processes each interaction as a discrete, stateless event. It has no memory. This is, frankly, more than can be said for most LLMs.</div>
+  </div>
+  <div class="faq-item reveal reveal-delay-4" onclick="toggleFaq(this)">
+    <div class="faq-q">Does AIKORSE support multi-modal input? <span class="faq-icon">+</span></div>
+    <div class="faq-a">Yes. It supports touch (primary), sight (it's visible), and sound (it makes a soft noise when thrown). Audio-visual-tactile trimodal architecture. Very impressive.</div>
+  </div>
+  <div class="faq-item reveal reveal-delay-5" onclick="toggleFaq(this)">
+    <div class="faq-q">Is there an enterprise plan? <span class="faq-icon">+</span></div>
+    <div class="faq-a">Yes. Contact us for bulk foam ball pricing. We offer volume discounts starting at 50 units. Many enterprise clients purchase one per meeting room. We support this decision.</div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="cta">
+  <div class="cta-glow"></div>
+  <div class="cta-eyebrow reveal">The future of stress relief</div>
+  <h2 class="cta-title reveal">We got your attention<br>with a foam ball.</h2>
+  <p class="cta-sub reveal">Imagine what we could do with your actual brief.</p>
+  <div class="cta-buttons reveal">
+    <button class="btn-primary">Order AIKORSE</button>
+    <button class="btn-ghost">See the research</button>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">AIKORSE</div>
+  <ul class="footer-links">
+    <li><a href="#">Terms</a></li>
+    <li><a href="#">Privacy</a></li>
+    <li><a href="#">Research</a></li>
+    <li><a href="#">GitHub</a></li>
+  </ul>
+  <div class="footer-copy">© 2026 AIKORSE. All rights reserved.</div>
+  <div class="footer-disclaimer">
+    This entire site is a fictional creative project. AIKORSE doesn't exist. No products are for sale. All AI claims are satirical and for entertainment purposes only. 73B parameters refers to an internal foam density estimate. Adobe Illustrator is not an AI model but we used it a lot.
+  </div>
+</footer>
+
+<!-- TWEAKS -->
+<div id="tweaks-panel">
+  <div class="tweaks-title">Tweaks</div>
+  <div class="tweak-row">
+    <div class="tweak-label">Accent Color <span id="tw-accent-val">Lime</span></div>
+    <select class="tweak-select" id="tw-accent" onchange="applyTweaks()">
+      <option value="oklch(0.88 0.22 128)">Lime</option>
+      <option value="oklch(0.75 0.2 250)">Electric Blue</option>
+      <option value="oklch(0.75 0.2 340)">Hot Pink</option>
+      <option value="oklch(0.82 0.18 55)">Amber</option>
+      <option value="oklch(0.72 0.18 300)">Purple</option>
+    </select>
+  </div>
+  <div class="tweak-row">
+    <div class="tweak-label">Background <span id="tw-bg-val">Black</span></div>
+    <select class="tweak-select" id="tw-bg" onchange="applyTweaks()">
+      <option value="#070707">Black</option>
+      <option value="#0a0614">Deep Indigo</option>
+      <option value="#080f08">Forest Dark</option>
+      <option value="#0f0a07">Warm Dark</option>
+    </select>
+  </div>
+  <div class="tweak-toggle-row">
+    Noise Texture
+    <button class="tweak-toggle on" id="tw-noise" onclick="toggleNoise(this)"></button>
+  </div>
+  <div class="tweak-toggle-row">
+    Ticker Visible
+    <button class="tweak-toggle on" id="tw-ticker" onclick="toggleTicker(this)"></button>
+  </div>
+</div>
+
+<script>
+  // ── Tweaks protocol ──
+  window.addEventListener('message', e => {
+    if (e.data?.type === '__activate_edit_mode') document.getElementById('tweaks-panel').style.display = 'block';
+    if (e.data?.type === '__deactivate_edit_mode') document.getElementById('tweaks-panel').style.display = 'none';
+  });
+  window.parent.postMessage({type: '__edit_mode_available'}, '*');
+
+  const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+    "accent": "oklch(0.88 0.22 128)",
+    "bg": "#0f0a07",
+    "noise": true,
+    "ticker": true
+  }/*EDITMODE-END*/;
+  let tweaks = {...TWEAK_DEFAULTS};
+
+  function applyTweaks() {
+    const accent = document.getElementById('tw-accent').value;
+    const bg = document.getElementById('tw-bg').value;
+    document.documentElement.style.setProperty('--lime', accent);
+    document.documentElement.style.setProperty('--bg', bg);
+    tweaks.accent = accent;
+    tweaks.bg = bg;
+    document.getElementById('tw-accent-val').textContent = document.getElementById('tw-accent').selectedOptions[0].text;
+    document.getElementById('tw-bg-val').textContent = document.getElementById('tw-bg').selectedOptions[0].text;
+    window.parent.postMessage({type:'__edit_mode_set_keys', edits: tweaks}, '*');
+  }
+
+  function toggleNoise(btn) {
+    btn.classList.toggle('on');
+    const on = btn.classList.contains('on');
+    document.body.style.setProperty('--noise-opacity', on ? '0.6' : '0');
+    tweaks.noise = on;
+    window.parent.postMessage({type:'__edit_mode_set_keys', edits: tweaks}, '*');
+  }
+
+  function toggleTicker(btn) {
+    btn.classList.toggle('on');
+    const on = btn.classList.contains('on');
+    document.querySelector('.ticker-section').style.display = on ? '' : 'none';
+    tweaks.ticker = on;
+    window.parent.postMessage({type:'__edit_mode_set_keys', edits: tweaks}, '*');
+  }
+
+  // ── Scroll reveal ──
+  const revealEls = document.querySelectorAll('.reveal');
+  const revealObs = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+  }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+  revealEls.forEach(el => revealObs.observe(el));
+
+  // ── Counter animation ──
+  const counterEls = document.querySelectorAll('[data-count]');
+  const counterObs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        animateCounter(e.target);
+        counterObs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.5 });
+  counterEls.forEach(el => counterObs.observe(el));
+
+  function animateCounter(el) {
+    const target = +el.dataset.count;
+    const suffix = el.dataset.suffix || '';
+    const duration = 1600;
+    const start = performance.now();
+    function frame(now) {
+      const t = Math.min((now - start) / duration, 1);
+      const ease = 1 - Math.pow(1 - t, 3);
+      el.textContent = Math.floor(ease * target) + suffix;
+      if (t < 1) requestAnimationFrame(frame);
+      else el.textContent = target + suffix;
+    }
+    requestAnimationFrame(frame);
+  }
+
+  // ── Interactive sliders ──
+  const msgs = {
+    low: "Low. AIKORSE is in standby mode. Enjoy the calm while it lasts.",
+    mid: "Moderate. AIKORSE recommends 3–5 squeezes daily. Also maybe a walk.",
+    high: "Elevated. Maximum grip force recommended. Have you tried breathing?",
+    critical: "CRITICAL STRESS LEVEL. AIKORSE is being squeezed continuously. Please close Slack."
+  };
+  function updateScore() {
+    const a = +document.getElementById('sl-anxiety').value;
+    const f = +document.getElementById('sl-frustration').value;
+    const d = +document.getElementById('sl-dread').value;
+    const score = Math.round((a * 3.5 + f * 3 + d * 2.5) / 9 * 10);
+    document.getElementById('val-anxiety').textContent = a;
+    document.getElementById('val-frustration').textContent = f;
+    document.getElementById('val-dread').textContent = d;
+    document.getElementById('score-val').textContent = score;
+    document.getElementById('score-bar').style.width = score + '%';
+    let msg;
+    if (score < 30) msg = msgs.low;
+    else if (score < 55) msg = msgs.mid;
+    else if (score < 78) msg = msgs.high;
+    else msg = msgs.critical;
+    document.getElementById('score-msg').textContent = msg;
+  }
+  ['sl-anxiety','sl-frustration','sl-dread'].forEach(id => {
+    document.getElementById(id).addEventListener('input', updateScore);
+  });
+
+  // ── FAQ ──
+  function toggleFaq(item) {
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+    if (!isOpen) item.classList.add('open');
+  }
+
+  // ── Tier switcher ──
+  function setTier(btn) {
+    document.querySelectorAll('.tier-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  // ── Nav progress ──
+  window.addEventListener('scroll', () => {
+    const progress = window.scrollY / (document.body.scrollHeight - window.innerHeight);
+    document.querySelector('nav').style.borderBottomColor = `rgba(${Math.round(progress * 100 + 100)},${Math.round(progress * 200)},0,${Math.min(progress * 0.4, 0.3)})`;
+  });
+</script>
+</body>
+</html>
